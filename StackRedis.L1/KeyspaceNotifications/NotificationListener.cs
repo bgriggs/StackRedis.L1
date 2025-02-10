@@ -17,9 +17,9 @@ namespace StackRedis.L1.KeyspaceNotifications
         private DatabaseInstanceData _database;
         private readonly ISubscriber _subscriber;
         private readonly int _databaseId;
-        
+
         internal bool Paused { get; set; }
-        
+
         internal NotificationListener(IDatabase redisDb)
         {
             var connection = redisDb.Multiplexer;
@@ -28,7 +28,7 @@ namespace StackRedis.L1.KeyspaceNotifications
             _databaseId = redisDb.Database;
 
             //Listen for standard redis keyspace events
-            _subscriber.Subscribe(string.Format(_keyspace, _databaseId) + "*", (channel, value) =>
+            _subscriber.Subscribe(RedisChannel.Pattern(string.Format(_keyspace, _databaseId) + "*"), (channel, value) =>
             {
                 if (Paused) return;
 
@@ -40,7 +40,7 @@ namespace StackRedis.L1.KeyspaceNotifications
             });
 
             //Listen for advanced keyspace events
-            _subscriber.Subscribe(string.Format(_keyspaceDetail, _databaseId) + "*", (channel, value) =>
+            _subscriber.Subscribe(RedisChannel.Pattern(string.Format(_keyspaceDetail, _databaseId) + "*"), (channel, value) =>
             {
                 if (Paused) return;
 
@@ -58,11 +58,11 @@ namespace StackRedis.L1.KeyspaceNotifications
                 }
             });
         }
-        
+
         public void Dispose()
         {
-            _subscriber.Unsubscribe(string.Format(_keyspace, _databaseId) + "*");
-            _subscriber.Unsubscribe(string.Format(_keyspaceDetail, _databaseId) + "*");
+            _subscriber.Unsubscribe(RedisChannel.Pattern(string.Format(_keyspace, _databaseId) + "*"));
+            _subscriber.Unsubscribe(RedisChannel.Pattern(string.Format(_keyspaceDetail, _databaseId) + "*"));
         }
 
         internal void HandleKeyspaceEvents(DatabaseInstanceData dbData)
@@ -116,11 +116,11 @@ namespace StackRedis.L1.KeyspaceNotifications
                 if (!string.IsNullOrEmpty(eventArg))
                 {
                     string[] scores = eventArg.Split('-');
-                    if(scores.Length == 3)
+                    if (scores.Length == 3)
                     {
                         double start, stop;
                         int exclude;
-                        if(double.TryParse(scores[0], out start) && double.TryParse(scores[1], out stop) && int.TryParse(scores[2], out exclude))
+                        if (double.TryParse(scores[0], out start) && double.TryParse(scores[1], out stop) && int.TryParse(scores[2], out exclude))
                         {
                             dbData.MemorySortedSets.DeleteByScore(key, start, stop, (Exclude)exclude);
                         }
@@ -132,7 +132,7 @@ namespace StackRedis.L1.KeyspaceNotifications
                 //A key was removed
                 dbData.MemoryCache.Remove(new[] { key });
             }
-            else if(eventName == "getdel")
+            else if (eventName == "getdel")
             {
                 //A key was removed
                 dbData.MemoryCache.Remove(new[] { key });
@@ -176,7 +176,7 @@ namespace StackRedis.L1.KeyspaceNotifications
         private static void HandleKeyspaceEvent(DatabaseInstanceData dbData, string key, string value)
         {
             System.Diagnostics.Debug.WriteLine("Keyspace event. Key=" + key + ", Value=" + value);
-            if(value == "expired")
+            if (value == "expired")
             {
                 //A key has expired. Sometimes the expiry is performed in-memory, so the key may have already been removed.
                 //It's also possible that the expiry is performed in redis and not in memory, so we listen for this event.

@@ -29,7 +29,7 @@ namespace StackRedis.L1.Test.SortedSet
         public void SortedSetScan_AddsToCache_Overload2()
         {
             _redisDirectDb.SortedSetAdd("key", "mem1", 1);
-            var scanResult = _memDb.SortedSetScan("key", "mem1", 10, StackExchange.Redis.CommandFlags.HighPriority);
+            var scanResult = _memDb.SortedSetScan("key", "mem1", 10);
             Assert.AreEqual(1, scanResult.Single().Score);
             Assert.AreEqual(1, CallsByMemDb);
 

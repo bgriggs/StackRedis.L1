@@ -28,9 +28,9 @@ namespace StackRedis.L1.Notifications
             _process = processId ?? ProcessId.GetCurrent();
         }
         
-        private void PublishEvent(string key, string keyMessage)
+void PublishEvent(string key, string keyMessage)
         {
-            var channel = _channelDb + key;
+            var channel = new RedisChannel(_channelDb + key, RedisChannel.PatternMode.Literal);
             var message = $"{_process}:{keyMessage}";
 
             //Publish the event
