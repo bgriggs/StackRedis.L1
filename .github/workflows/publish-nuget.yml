@@ -23,8 +23,8 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet build StackRedis.L1/StackRedis.L1.csproj --no-restore --configuration Release
+        run: dotnet build StackRedis.L1/BigMission.StackRedis.L1.csproj --no-restore --configuration Release
       - name: Create the package
-        run: dotnet pack StackRedis.L1/StackRedis.L1.csproj --configuration Release
+        run: dotnet pack StackRedis.L1/BigMission.StackRedis.L1.csproj --configuration Release
       - name: Publish the package to Nuget
         run: dotnet nuget push StackRedis.L1\bin\Release\*.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_TOKEN}} --skip-duplicate
