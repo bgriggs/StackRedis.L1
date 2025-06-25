@@ -26,6 +26,6 @@
     <PackageReference Include="StackExchange.Redis" Version="2.8.24" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\StackRedis.L1\StackRedis.L1.csproj" />
+    <ProjectReference Include="..\StackRedis.L1\BigMission.StackRedis.L1.csproj" />
   </ItemGroup>
 </Project>
